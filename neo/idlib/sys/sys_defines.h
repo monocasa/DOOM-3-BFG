@@ -14,7 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 Doom 3 BFG Edition Source Code is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU General Public License for more detaiev/doom3-wii/DOOM-3-BFG/neo/idlibls.
 
 You should have received a copy of the GNU General Public License
 along with Doom 3 BFG Edition Source Code.  If not, see <http://www.gnu.org/licenses/>.
@@ -35,7 +35,7 @@ If you have questions concerning this license or the applicable additional terms
 
 ================================================================================================
 */
-
+#ifdef _WIN32
 
 #define	CPUSTRING						"x86"
 
@@ -64,10 +64,82 @@ If you have questions concerning this license or the applicable additional terms
 #define ID_FORCE_INLINE_EXTERN			extern __forceinline
 #endif
 
+// We need to inform the compiler that Error() and FatalError() will
+// never return, so any conditions that leeds to them being called are
+// guaranteed to be false in the following code
+#define NO_RETURN						__declspec(noreturn)
+
+// Setup for /analyze code analysis, which we currently only have on the 360, but
+// we may get later for win32 if we buy the higher end vc++ licenses.
+// 
+// Even with VS2010 ultmate, /analyze only works for x86, not x64
+// 
+// Also note the __analysis_assume macro in sys_assert.h relates to code analysis.
+// 
+// This header should be included even by job code that doesn't reference the
+// bulk of the codebase, so it is the best place for analyze pragmas.
+
+// disable some /analyze warnings here
+#pragma warning( disable: 6255 )	// warning C6255: _alloca indicates failure by raising a stack overflow exception. Consider using _malloca instead. (Note: _malloca requires _freea.)
+#pragma warning( disable: 6262 )	// warning C6262: Function uses '36924' bytes of stack: exceeds /analyze:stacksize'32768'. Consider moving some data to heap
+#pragma warning( disable: 6326 )	// warning C6326: Potential comparison of a constant with another constant
+
+#pragma warning( disable: 6031 )	//  warning C6031: Return value ignored
+// this warning fires whenever you have two calls to new in a function, but we assume new never fails, so it is not relevant for us
+#pragma warning( disable: 6211 )	// warning C6211: Leaking memory 'staticModel' due to an exception. Consider using a local catch block to clean up memory
+
+// we want to fix all these at some point...
+#pragma warning( disable: 6246 )	// warning C6246: Local declaration of 'es' hides declaration of the same name in outer scope. For additional information, see previous declaration at line '969' of 'w:\tech5\rage\game\ai\fsm\fsm_combat.cpp': Lines: 969
+#pragma warning( disable: 6244 )	// warning C6244: Local declaration of 'viewList' hides previous declaration at line '67' of 'w:\tech5\engine\renderer\rendertools.cpp'
+
+// win32 needs this, but 360 doesn't
+#pragma warning( disable: 6540 )	// warning C6540: The use of attribute annotations on this function will invalidate all of its existing __declspec annotations [D:\tech5\engine\engine-10.vcxproj]
+
+
+// checking format strings catches a LOT of errors
+#include <CodeAnalysis\SourceAnnotations.h>
+#define	VERIFY_FORMAT_STRING	[SA_FormatString(Style="printf")]
+
 // we should never rely on this define in our code. this is here so dodgy external libraries don't get confused
 #ifndef WIN32
 	#define WIN32
 #endif
+
+/*
+================================================================================================
+
+	Wii (libogc)
+
+================================================================================================
+*/
+
+#elif defined(GEKKO)
+
+#define CPUSTRING						"ppc-ps"
+
+#define BUILD_STRING					"wiiogc"- CPUSTRING
+#define BUILD_OS_ID						0
+
+#define ALIGN16( x )					__attribute__((__aligned__(16)) x
+#define ALIGNTYPE16						__attribute__((__aligned__(16))
+#define ALIGNTYPE128					__attribute__((__aligned__(128))
+#define FORMAT_PRINTF( x )
+
+#define PATHSEPERATOR_STR				"\\"
+#define PATHSEPERATOR_CHAR				'\\'
+#define NEWLINE							"\n"
+
+#define ID_INLINE						inline
+#define ID_FORCE_INLINE					static inline
+
+#define ID_INLINE_EXTERN				inline
+#define ID_FORCE_INLINE_EXTERN			static inline
+
+#define NO_RETURN						__attribute__((__noreturn__))
+
+#define VERIFY_FORMAT_STRING
+
+#endif /* Platforms */
 
 /*
 ================================================================================================
@@ -92,48 +164,6 @@ Defines and macros usable in all code
 private:									\
   TypeName(const TypeName&);				\
   void operator=(const TypeName&);
-
-
-/*
-================================================================================================
-Setup for /analyze code analysis, which we currently only have on the 360, but
-we may get later for win32 if we buy the higher end vc++ licenses.
-
-Even with VS2010 ultmate, /analyze only works for x86, not x64
-
-Also note the __analysis_assume macro in sys_assert.h relates to code analysis.
-
-This header should be included even by job code that doesn't reference the
-bulk of the codebase, so it is the best place for analyze pragmas.
-================================================================================================
-*/
-
-// disable some /analyze warnings here
-#pragma warning( disable: 6255 )	// warning C6255: _alloca indicates failure by raising a stack overflow exception. Consider using _malloca instead. (Note: _malloca requires _freea.)
-#pragma warning( disable: 6262 )	// warning C6262: Function uses '36924' bytes of stack: exceeds /analyze:stacksize'32768'. Consider moving some data to heap
-#pragma warning( disable: 6326 )	// warning C6326: Potential comparison of a constant with another constant
-
-#pragma warning( disable: 6031 )	//  warning C6031: Return value ignored
-// this warning fires whenever you have two calls to new in a function, but we assume new never fails, so it is not relevant for us
-#pragma warning( disable: 6211 )	// warning C6211: Leaking memory 'staticModel' due to an exception. Consider using a local catch block to clean up memory
-
-// we want to fix all these at some point...
-#pragma warning( disable: 6246 )	// warning C6246: Local declaration of 'es' hides declaration of the same name in outer scope. For additional information, see previous declaration at line '969' of 'w:\tech5\rage\game\ai\fsm\fsm_combat.cpp': Lines: 969
-#pragma warning( disable: 6244 )	// warning C6244: Local declaration of 'viewList' hides previous declaration at line '67' of 'w:\tech5\engine\renderer\rendertools.cpp'
-
-// win32 needs this, but 360 doesn't
-#pragma warning( disable: 6540 )	// warning C6540: The use of attribute annotations on this function will invalidate all of its existing __declspec annotations [D:\tech5\engine\engine-10.vcxproj]
-
-
-// checking format strings catches a LOT of errors
-#include <CodeAnalysis\SourceAnnotations.h>
-#define	VERIFY_FORMAT_STRING	[SA_FormatString(Style="printf")]
-
-
-// We need to inform the compiler that Error() and FatalError() will
-// never return, so any conditions that leeds to them being called are
-// guaranteed to be false in the following code
-#define NO_RETURN __declspec(noreturn)
 
 
 // I don't want to disable "warning C6031: Return value ignored" from /analyze

@@ -56,8 +56,11 @@ public:
 
 ===============================================================================
 */
-
-#define VPCALL __fastcall
+#ifdef _WIN32
+	#define VPCALL __fastcall
+#else
+	#define VPCALL
+#endif
 
 class idVec2;
 class idVec3;

@@ -71,10 +71,17 @@ enum utf8Encoding_t {
 #endif
 #define StrCmpNI		use_idStr_Icmpn
 
+#ifndef stricmp
 #define stricmp			idStr::Icmp		// use_idStr_Icmp
+#endif
+
 #define _stricmp		use_idStr_Icmp
 #define strcasecmp		use_idStr_Icmp
+
+#ifndef strnicmp
 #define strnicmp		use_idStr_Icmpn
+#endif
+
 #define _strnicmp		use_idStr_Icmpn
 #define _memicmp		use_idStr_Icmpn
 

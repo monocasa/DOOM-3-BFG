@@ -107,6 +107,10 @@ struct idNullPtr {
 		#define nullptr	idNullPtr()		
 #endif
 
+#ifndef uintptr_t
+	typedef unsigned int * uintptr_t;
+#endif
+
 #ifndef BIT
 #define BIT( num )				( 1ULL << ( num ) )
 #endif

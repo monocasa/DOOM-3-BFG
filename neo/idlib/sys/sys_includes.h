@@ -38,6 +38,7 @@ If you have questions concerning this license or the applicable additional terms
 ================================================================================================
 */
 
+#ifdef _WIN32
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// prevent auto literal to string conversion
 
@@ -70,6 +71,19 @@ If you have questions concerning this license or the applicable additional terms
 #include <malloc.h>							// no malloc.h on mac or unix
 #include <windows.h>						// for qgl.h
 #undef FindText								// fix namespace pollution
+
+
+/*
+================================================================================================
+
+	Wii (libogc)
+
+================================================================================================
+*/
+
+#elif defined(GEKKO)
+
+#endif /*Platforms*/
 
 /*
 ================================================================================================

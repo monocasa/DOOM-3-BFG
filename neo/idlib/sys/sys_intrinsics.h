@@ -67,6 +67,7 @@ ID_FORCE_INLINE void Prefetch( const void * ptr, int offset ) {
 }
 ID_FORCE_INLINE void ZeroCacheLine( void * ptr, int offset ) {
 	assert_128_byte_aligned( ptr );
+#ifdef _WIN32
 	char * bytePtr = ( (char *) ptr ) + offset;
 	__m128i zero = _mm_setzero_si128();
 	_mm_store_si128( (__m128i *) ( bytePtr + 0*16 ), zero );
@@ -77,11 +78,15 @@ ID_FORCE_INLINE void ZeroCacheLine( void * ptr, int offset ) {
 	_mm_store_si128( (__m128i *) ( bytePtr + 5*16 ), zero );
 	_mm_store_si128( (__m128i *) ( bytePtr + 6*16 ), zero );
 	_mm_store_si128( (__m128i *) ( bytePtr + 7*16 ), zero );
+#endif
 }
+
 ID_FORCE_INLINE void FlushCacheLine( const void * ptr, int offset ) {
+#ifdef _WIN32
 	const char * bytePtr = ( (const char *) ptr ) + offset;
 	_mm_clflush( bytePtr +  0 );
 	_mm_clflush( bytePtr + 64 );
+#endif
 }
 
 /*
@@ -130,6 +135,7 @@ ID_INLINE_EXTERN int CACHE_LINE_CLEAR_OVERFLOW_COUNT( int size ) {
 	PC Windows
 ================================================
 */
+#ifdef _WIN32
 
 #if !defined( R_SHUFFLE_D )
 #define R_SHUFFLE_D( x, y, z, w )	(( (w) & 3 ) << 6 | ( (z) & 3 ) << 4 | ( (y) & 3 ) << 2 | ( (x) & 3 ))
@@ -196,5 +202,37 @@ ID_FORCE_INLINE_EXTERN __m128 _mm_div16_ps( __m128 x, __m128 y ) {
 #define _mm_loadu_bounds_0( bounds )		_mm_perm_ps( _mm_loadh_pi( _mm_load_ss( & bounds[0].x ), (__m64 *) & bounds[0].y ), _MM_SHUFFLE( 1, 3, 2, 0 ) )
 // load idBounds::GetMaxs()
 #define _mm_loadu_bounds_1( bounds )		_mm_perm_ps( _mm_loadh_pi( _mm_load_ss( & bounds[1].x ), (__m64 *) & bounds[1].y ), _MM_SHUFFLE( 1, 3, 2, 0 ) )
+
+#elif defined(GEKKO)
+
+typedef struct {
+	float r0;
+	float r1;
+	float r2;
+	float r3;
+} __m128;
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_load_ss( float *p )
+{
+	__m128 ret = { *p, 0.0f, 0.0f, 0.0f };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN int _mm_cvttss_si32( __m128 &a )
+{
+	return (int)a.r0;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_max_ss( __m128 &a, __m128 &b )
+{
+	__m128 ret = {
+		(a.r0 > b.r0) ? a.r0 : b.r0,
+		a.r1,
+		a.r2,
+		a.r3 };
+	return ret;
+}
+
+#endif
 
 #endif	// !__SYS_INTRIINSICS_H__

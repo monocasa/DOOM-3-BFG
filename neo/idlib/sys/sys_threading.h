@@ -38,6 +38,7 @@ If you have questions concerning this license or the applicable additional terms
 ================================================================================================
 */
 
+#ifdef _WIN32
 	typedef CRITICAL_SECTION		mutexHandle_t;
 	typedef HANDLE					signalHandle_t;
 	typedef LONG					interlockedInt_t;
@@ -48,7 +49,14 @@ If you have questions concerning this license or the applicable additional terms
 	#pragma intrinsic(_ReadWriteBarrier)
 	#define SYS_MEMORYBARRIER		_ReadWriteBarrier(); MemoryBarrier()
 
+#elif defined(GEKKO)
+	typedef int                     mutexHandle_t;
+	typedef int                     signalHandle_t;
+	typedef int                     interlockedInt_t;
 
+	#define SYS_MEMORYBARRIER
+
+#endif /*Platforms*/
 
 
 
@@ -61,7 +69,7 @@ If you have questions concerning this license or the applicable additional terms
 ================================================================================================
 */
 
-
+#ifdef _WIN32
 	class idSysThreadLocalStorage {
 	public:
 		idSysThreadLocalStorage() { 
@@ -83,6 +91,25 @@ If you have questions concerning this license or the applicable additional terms
 		}	
 		DWORD	tlsIndex;
 	};
+
+#elif defined(GEKKO)
+	class idSysThreadLocalStorage {
+	public:
+		idSysThreadLocalStorage() { 
+		}
+		idSysThreadLocalStorage( const ptrdiff_t &val ) {
+		}
+		~idSysThreadLocalStorage() {
+		}
+		operator ptrdiff_t() {
+			return 0;
+		}
+		const ptrdiff_t & operator = ( const ptrdiff_t &val ) {
+			return val;
+		}
+	};
+
+#endif /*Platforms*/
 
 #define ID_TLS idSysThreadLocalStorage
 

@@ -1,0 +1,9 @@
+commented out #include "../renderer/qgl.h" in precompiled.h
+
+ZeroCacheLine unimplemented
+FlushCacheLine unimplemented
+
+idSysThreadLocalStorage unimplemented
+
+idlib/math/Math.h may warrant another look through
+

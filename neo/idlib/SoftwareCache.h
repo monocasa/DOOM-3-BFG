@@ -28,7 +28,9 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __SOFTWARECACHE_H__
 #define __SOFTWARECACHE_H__
 
+#ifdef _MSC_VER
 #pragma warning( disable : 4324 )	// structure was padded due to __declspec(align())
+#endif
 
 /*
 ================================================================================================
