@@ -6,8 +6,9 @@ SET( EXE_NAME doom3 )
 
 SET( IDLIB_ROOT idlib )
 SET( IDLIB_FILES ${IDLIB_ROOT}/bv/Bounds.cpp 
-                 ${IDLIB_ROOT}/bv/Box.cpp 
-                 ${IDLIB_ROOT}/bv/Sphere.cpp )
+#                 ${IDLIB_ROOT}/bv/Box.cpp 
+#                 ${IDLIB_ROOT}/bv/Sphere.cpp 
+)
 
 SET( SYS_ROOT sys/wii-ogc )
 SET( SYS_FILES ${SYS_ROOT}/main.cpp )

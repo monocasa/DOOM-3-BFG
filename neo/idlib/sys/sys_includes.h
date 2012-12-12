@@ -83,6 +83,10 @@ If you have questions concerning this license or the applicable additional terms
 
 #elif defined(GEKKO)
 
+#include <alloca.h>
+
+#define _alloca alloca
+
 #endif /*Platforms*/
 
 /*

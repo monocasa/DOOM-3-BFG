@@ -47,6 +47,8 @@ If you have questions concerning this license or the applicable additional terms
 #define ALIGNTYPE128					__declspec(align(128))
 #define FORMAT_PRINTF( x )
 
+#define INTRINTYPE						__declspec(intrin_type)
+
 #define PATHSEPARATOR_STR				"\\"
 #define PATHSEPARATOR_CHAR				'\\'
 #define NEWLINE							"\r\n"
@@ -124,6 +126,8 @@ If you have questions concerning this license or the applicable additional terms
 #define ALIGNTYPE16						__attribute__((__aligned__(16))
 #define ALIGNTYPE128					__attribute__((__aligned__(128))
 #define FORMAT_PRINTF( x )
+
+#define INTRINTYPE
 
 #define PATHSEPERATOR_STR				"\\"
 #define PATHSEPERATOR_CHAR				'\\'

@@ -108,7 +108,11 @@ struct idNullPtr {
 #endif
 
 #ifndef uintptr_t
-	typedef unsigned int * uintptr_t;
+	typedef uint32 * uintptr_t;
+#endif
+
+#ifndef UINT_PTR
+	typedef size_t UINT_PTR;
 #endif
 
 #ifndef BIT

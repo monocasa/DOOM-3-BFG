@@ -141,8 +141,185 @@ ID_INLINE_EXTERN int CACHE_LINE_CLEAR_OVERFLOW_COUNT( int size ) {
 #define R_SHUFFLE_D( x, y, z, w )	(( (w) & 3 ) << 6 | ( (z) & 3 ) << 4 | ( (y) & 3 ) << 2 | ( (x) & 3 ))
 #endif
 
+/*
+================================================
+
+	Wii (libogc)
+
+================================================
+*/
+#elif defined(GEKKO)
+
+typedef struct {
+	float r0;
+	float r1;
+	float r2;
+	float r3;
+} __attribute__((__aligned__(16))) __m128;
+
+typedef struct {
+	uint32 r0;
+	uint32 r1;
+	uint32 r2;
+	uint32 r3;
+} __attribute__((__aligned__(16))) __m128i;
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_load_ss( const float *p )
+{
+	__m128 ret = { *p, 0.0f, 0.0f, 0.0f };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN int _mm_cvttss_si32( __m128 &a )
+{
+	return (int)a.r0;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_max_ss( __m128 a, __m128 b )
+{
+	__m128 ret = { 
+		(a.r0 > b.r0) ? a.r0 : b.r0,
+		a.r1,
+		a.r2,
+		a.r3 };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_min_ss( __m128 a, __m128 b )
+{
+	__m128 ret = { 
+		(a.r0 < b.r0) ? a.r0 : b.r0,
+		a.r1,
+		a.r2,
+		a.r3 };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_setzero_ps( void )
+{
+	__m128 ret = { 0.0f, 0.0f, 0.0f, 0.0f };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_load_ps( const float * p )
+{
+	__m128 ret = { p[0], p[1], p[2], p[3] };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_load1_ps( const float * p )
+{
+	__m128 ret = { *p, *p, *p, *p };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN void _mm_store_ps( float * p, __m128 a )
+{
+	p[0] = a.r0;
+	p[1] = a.r1;
+	p[2] = a.r2;
+	p[3] = a.r3;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_add_ps( __m128 a, __m128 b )
+{
+	__m128 ret = {
+		a.r0 + b.r0,
+		a.r1 + b.r1,
+		a.r2 + b.r2,
+		a.r3 + b.r3 };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_sub_ps( __m128 a, __m128 b )
+{
+	__m128 ret = {
+		a.r0 - b.r0,
+		a.r1 - b.r1,
+		a.r2 - b.r2,
+		a.r3 - b.r3 };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_mul_ps( __m128 a, __m128 b )
+{
+	__m128 ret = {
+		a.r0 * b.r0,
+		a.r1 * b.r1,
+		a.r2 * b.r2,
+		a.r3 * b.r3 };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_rcp_ps( __m128 a )
+{
+	__m128 ret = { 1 / a.r0, 1 / a.r1, 1 / a.r2, 1 / a.r3 };
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_xor_ps( __m128 a, __m128 b )
+{
+	__m128 ret;
+	__m128i *reti = (__m128i*)&ret;
+	__m128i *ai = (__m128i*)&a;
+	__m128i *bi = (__m128i*)&b;
+
+	reti->r0 = ai->r0 ^ bi->r0;
+	reti->r1 = ai->r1 ^ bi->r1;
+	reti->r2 = ai->r2 ^ bi->r2;
+	reti->r3 = ai->r3 ^ bi->r3;
+
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_shuffle_ps( __m128 a, __m128 b, int i )
+{
+	__m128 ret;
+
+	float *af = &a.r0;
+	float *bf = &b.r0;
+
+	ret.r3 = af[ (i >> 6) & 3 ];
+	ret.r2 = af[ (i >> 4) & 3 ];
+	ret.r1 = bf[ (i >> 3) & 3 ];
+	ret.r0 = bf[ (i >> 0) & 3 ];
+
+	return ret;
+}
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_shuffle_epi32( __m128 a, int i )
+{
+	__m128 ret;
+	float *af = & a.r0;
+
+	ret.r3 = af[ (i >> 6) & 3 ];
+	ret.r2 = af[ (i >> 4) & 3 ];
+	ret.r1 = af[ (i >> 3) & 3 ];
+	ret.r0 = af[ (i >> 0) & 3 ];
+
+	return ret;
+}
+
+#define _MM_SHUFFLE(z, y, x, w)  ((z<<6) | (y<<4) | (x<<2) | w)
+
+ID_FORCE_INLINE_EXTERN __m128 _mm_unpacklo_ps( __m128 a, __m128 b )
+{
+	__m128 ret = { a.r0, b.r0, a.r1, b.r1 };
+	return ret;
+}
+
+/*
+================================================
+
+	Platform Independent
+
+================================================
+*/
+
+#endif
+
 // make the intrinsics "type unsafe"
-typedef union __declspec(intrin_type) _CRT_ALIGN(16) __m128c {
+typedef union INTRINTYPE ALIGNTYPE16 __m128c {
 				__m128c() {}
 				__m128c( __m128 f ) { m128 = f; }
 				__m128c( __m128i i ) { m128i = i; }
@@ -202,37 +379,5 @@ ID_FORCE_INLINE_EXTERN __m128 _mm_div16_ps( __m128 x, __m128 y ) {
 #define _mm_loadu_bounds_0( bounds )		_mm_perm_ps( _mm_loadh_pi( _mm_load_ss( & bounds[0].x ), (__m64 *) & bounds[0].y ), _MM_SHUFFLE( 1, 3, 2, 0 ) )
 // load idBounds::GetMaxs()
 #define _mm_loadu_bounds_1( bounds )		_mm_perm_ps( _mm_loadh_pi( _mm_load_ss( & bounds[1].x ), (__m64 *) & bounds[1].y ), _MM_SHUFFLE( 1, 3, 2, 0 ) )
-
-#elif defined(GEKKO)
-
-typedef struct {
-	float r0;
-	float r1;
-	float r2;
-	float r3;
-} __m128;
-
-ID_FORCE_INLINE_EXTERN __m128 _mm_load_ss( float *p )
-{
-	__m128 ret = { *p, 0.0f, 0.0f, 0.0f };
-	return ret;
-}
-
-ID_FORCE_INLINE_EXTERN int _mm_cvttss_si32( __m128 &a )
-{
-	return (int)a.r0;
-}
-
-ID_FORCE_INLINE_EXTERN __m128 _mm_max_ss( __m128 &a, __m128 &b )
-{
-	__m128 ret = {
-		(a.r0 > b.r0) ? a.r0 : b.r0,
-		a.r1,
-		a.r2,
-		a.r3 };
-	return ret;
-}
-
-#endif
 
 #endif	// !__SYS_INTRIINSICS_H__
